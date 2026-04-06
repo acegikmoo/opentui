@@ -2111,6 +2111,10 @@ export class CliRenderer extends EventEmitter implements RenderContext {
     }
 
     this.currentRenderBuffer.clear(this.backgroundColor)
+
+    // Normal diff skips unchanged cells leaving transparency visible. force=true repaints all.
+    this.lib.render(this.rendererPtr, true)
+
     this._controlState = this._previousControlState
 
     if (
