@@ -116,6 +116,27 @@ test("resume() restores previous AUTO_STARTED state and restarts rendering", () 
   expect(renderer.isRunning).toBe(true)
 })
 
+test("resume() triggers a force render to fix transparency artifacts", () => {
+  renderer.start()
+  renderer.suspend()
+
+  let forceRenderCalled = false
+
+  // @ts-expect-error - lib is private
+  const originalRender = renderer.lib.render.bind(renderer.lib)
+  // @ts-expect-error - lib is private
+  renderer.lib.render = (ptr: any, force: boolean) => {
+    if (force) forceRenderCalled = true
+  return originalRender(ptr, force)
+  }
+
+  renderer.resume()
+  expect(forceRenderCalled).toBe(true)
+
+  // @ts-expect-error - lib is private
+  renderer.lib.render = originalRender
+})
+
 test("stop() transitions to EXPLICIT_STOPPED and stops rendering", () => {
   renderer.start()
   expect(renderer.isRunning).toBe(true)
